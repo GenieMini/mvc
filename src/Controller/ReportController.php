@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ReportController extends AbstractController
@@ -30,5 +32,32 @@ class ReportController extends AbstractController
     public function report(): Response
     {
         return $this->render('report.html.twig');
+    }
+
+    // kmom 2 __________________________
+    /**
+     * @Route("/card", name="card", methods={"GET", "HEAD"})
+     */
+    public function card(): Response
+    {
+        return $this->render('');
+    }
+
+    /**
+     * @Route("/card", name="card-process", methods={"POST"})
+     */
+    public function cardProcess(
+        Request $request,
+        SessionInterface $session 
+    ): Response {
+        $var  = $request->request->get('var');
+
+        $val  = $session->get("sum") ?? 0;
+
+        // $session->set("sum", $val);
+
+        $this->addFlash("info", "You are bababooey, $var");
+
+        return $this->redirectToRoute('card');
     }
 }
