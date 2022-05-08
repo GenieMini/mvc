@@ -1,0 +1,41 @@
+{% extends "base.html.twig" %}
+{% block title %}Card{% endblock %}
+{% block header %}Card{% endblock %}
+{% block content %}
+
+{% for card in deck %}
+<img src="img/cards/{{card.value}}_{{card.suit}}.png" style="width:100px">
+{% endfor %}
+
+<h3>
+This page creates a deck for you!
+and puts it in session
+</h3>
+
+<ul>
+    <li><a href="{{ path('card-deck')}}">
+    Deck
+    </a></li>
+
+    <li><a href="{{ path('card-shuffle')}}">
+    Shuffle
+    </a></li>
+
+    <li><a href="{{ path('card-draw')}}">
+    Draw
+    </a></li>
+
+    <li><a href="{{ path('card-draw-number', {number: 5})}}">
+    Draw Number
+    </a></li>
+
+    <li><a href="{{ path('card-deal-players-cards', {players: 2, cards: 5})}}">
+    Deal Player Cards
+    </a></li>
+
+    <li><a href="{{ path('card-deck2')}}">
+    Deck2
+    </a></li>
+</ul>
+
+{% endblock %}

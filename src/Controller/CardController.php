@@ -16,23 +16,26 @@ class CardController extends AbstractController
     /**
      * @Route("/card", name="card", methods={"GET", "HEAD"})
      */
-    public function card(): Response
+    public function card(SessionInterface $session ): Response
     {
-        return $this->render('');
+        $deck  = $session->get("deck") ?? 0;
+        if (gettype($deck) == "integer") {
+            $session->set("deck", new Deck());
+        }
+
+        return $this->render('card/card.html.twig', ['deck' => $deck->deck]);
     }
 
     /**
      * @Route("card/api/deck", name="card-api", methods={"GET"})
      */
-    public function cardAPI(): Response
+    public function cardAPI(SessionInterface $session): Response
     {
-        $deck = new Deck();
+        $deck  = $session->get("deck") ?? 0;
+        if (gettype($deck) == "integer") {
+            $session->set("deck", new Deck());
+        }
 
-        /* $data = [
-            'message' => 'Welcome to the lucky number API',
-            'deck' => $deck->deck
-        ]; */
-        
         return new JsonResponse($deck->deck);
     }
 
@@ -52,5 +55,54 @@ class CardController extends AbstractController
         $this->addFlash("info", "You are bababooey, $var");
 
         return $this->redirectToRoute('card');
+    }
+
+    //  ____________________________
+    /**
+     * @Route("/card/deck", name="card-deck", methods={"GET", "HEAD"})
+     */
+    public function cardDeck(): Response
+    {
+        return $this->render('card/card.html.twig');
+    }
+
+    /**
+     * @Route("/card/deck/shuffle", name="card-shuffle", methods={"GET", "HEAD"})
+     */
+    public function cardShuffle(): Response
+    {
+        return $this->render('card/card.html.twig');
+    }
+
+    /**
+     * @Route("/card/deck/draw", name="card-draw", methods={"GET", "HEAD"})
+     */
+    public function cardDraw(): Response
+    {
+        return $this->render('card/card.html.twig');
+    }
+
+    /**
+     * @Route("/card/deck/draw/{number}", name="card-draw-number", methods={"GET", "HEAD"})
+     */
+    public function cardDrawNumber(): Response
+    {
+        return $this->render('card/card.html.twig');
+    }
+
+    /**
+     * @Route("/card/deck/deal/{players}/{cards}", name="card-deal-players-cards", methods={"GET", "HEAD"})
+     */
+    public function cardDealPlayers(): Response
+    {
+        return $this->render('card/card.html.twig');
+    }
+
+    /**
+     * @Route("/card/deck2", name="card-deck2", methods={"GET", "HEAD"})
+     */
+    public function cardDeck2(): Response
+    {
+        return $this->render('card/card.html.twig');
     }
 }

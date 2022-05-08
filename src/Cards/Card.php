@@ -4,9 +4,9 @@ namespace App\Cards;
 
 class Card
 {
-    public $value;
-    public $suit;
-    
+    public $value; // 1-13
+    public $suit;  // 0-3  : spades, hearts, clubs, diamond
+
     // Methods
     public function __construct($value, $suit)
     {
