@@ -14,11 +14,10 @@ class Card
         $this->suit = $suit;
     }
 
-    public function get_value() {
+    /* public function get_value() {
         return $this->value;
     }
     public function get_suit() {
         return $this->suit;
-    }
+    } */
 }
-

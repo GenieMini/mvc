@@ -16,14 +16,19 @@ class CardController extends AbstractController
     /**
      * @Route("/card", name="card", methods={"GET", "HEAD"})
      */
-    public function card(SessionInterface $session ): Response
+    public function card(SessionInterface $session): Response
     {
-        $deck  = $session->get("deck") ?? 0;
-        if (gettype($deck) == "integer") {
+        $deck  = $session->get("deck") ?? [];
+        if (gettype($deck) == "array") {
             $session->set("deck", new Deck());
         }
 
-        return $this->render('card/card.html.twig', ['deck' => $deck->deck]);
+        $data = [
+            'deck' => $deck->deck,
+            'message' => "This page creates a deck for you!\nand puts it in session"
+        ];
+
+        return $this->render('card/card.html.twig', $data);
     }
 
     /**
@@ -31,78 +36,168 @@ class CardController extends AbstractController
      */
     public function cardAPI(SessionInterface $session): Response
     {
-        $deck  = $session->get("deck") ?? 0;
-        if (gettype($deck) == "integer") {
+        $deck  = $session->get("deck") ?? [];
+        if (gettype($deck) == "array") {
             $session->set("deck", new Deck());
         }
 
         return new JsonResponse($deck->deck);
     }
 
-    /**
-     * @Route("/card", name="card-process", methods={"POST"})
-     */
-    public function cardProcess(
-        Request $request,
-        SessionInterface $session 
-    ): Response {
-        $var  = $request->request->get('var');
-
-        $val  = $session->get("sum") ?? 0;
-
-        // $session->set("sum", $val);
-
-        $this->addFlash("info", "You are bababooey, $var");
-
-        return $this->redirectToRoute('card');
-    }
-
     //  ____________________________
     /**
      * @Route("/card/deck", name="card-deck", methods={"GET", "HEAD"})
      */
-    public function cardDeck(): Response
+    public function cardDeck(SessionInterface $session): Response
     {
-        return $this->render('card/card.html.twig');
+        $deck   = $session->get("deck") ?? [];
+        $cards  = [];
+        $values = [];
+        $suits  = [];
+        if (gettype($deck) == "object") {
+            for ($i = 0; $i < count($deck->deck); $i++) {
+                $values[] = $deck->deck[$i]->value;
+                $suits[] = $deck->deck[$i]->suit;
+            }
+
+            array_multisort($suits, $values);
+            $sorted = new Deck(false);
+
+            for ($i = 0; $i < count($deck->deck); $i++) {
+                $sorted->add_card($values[$i], $suits[$i]);
+            }
+
+            $cards = $sorted->deck;
+        }
+
+        $data = [
+            'deck' => $cards,
+            'message' => "Heres the sorted deck"
+        ];
+
+        return $this->render('card/card.html.twig', $data);
     }
 
     /**
      * @Route("/card/deck/shuffle", name="card-shuffle", methods={"GET", "HEAD"})
      */
-    public function cardShuffle(): Response
+    public function cardShuffle(SessionInterface $session): Response
     {
-        return $this->render('card/card.html.twig');
+        $deck = new Deck();
+        shuffle($deck->deck);
+        $session->set("deck", $deck);
+
+        $cards = $deck->deck;
+
+        $data = [
+            'deck' => $cards,
+            'message' => "We shuffled the deck!"
+        ];
+
+        return $this->render('card/card.html.twig', $data);
     }
 
     /**
      * @Route("/card/deck/draw", name="card-draw", methods={"GET", "HEAD"})
      */
-    public function cardDraw(): Response
+    public function cardDraw(SessionInterface $session): Response
     {
-        return $this->render('card/card.html.twig');
+        $deck  = $session->get("deck") ?? [];
+        $cards  = [];
+        if (gettype($deck) == "object") {
+            if ($deck->deck != []) {
+                $cards[] = array_pop($deck->deck);
+            }
+        }
+
+        if ($deck->deck == []) {
+            $message = "deck is empty!";
+        } else {
+            $message = "We drew a card from the deck!";
+        }
+
+        $data = [
+            'deck' => $cards,
+            'message' => $message
+        ];
+
+        return $this->render('card/card.html.twig', $data);
     }
 
     /**
      * @Route("/card/deck/draw/{number}", name="card-draw-number", methods={"GET", "HEAD"})
      */
-    public function cardDrawNumber(): Response
+    public function cardDrawNumber(SessionInterface $session, int $number): Response
     {
-        return $this->render('card/card.html.twig');
+        $deck  = $session->get("deck") ?? [];
+        $cards  = [];
+        if (gettype($deck) == "object") {
+            if (count($deck->deck) < $number) {
+                $message = "not enough cards to draw $number";
+            } else {
+                $message = "we drew $number cards";
+                for ($i = 0; $i < $number; $i++) {
+                    $cards[] = array_pop($deck->deck);
+                }
+            }
+        }
+
+        $data = [
+            'deck' => $cards,
+            'message' => $message
+        ];
+
+        return $this->render('card/card.html.twig', $data);
     }
 
     /**
      * @Route("/card/deck/deal/{players}/{cards}", name="card-deal-players-cards", methods={"GET", "HEAD"})
      */
-    public function cardDealPlayers(): Response
+    public function cardDealPlayers(SessionInterface $session, int $players, int $cards): Response
     {
-        return $this->render('card/card.html.twig');
+        $deck  = $session->get("deck") ?? [];
+        $deal  = [];
+        if (gettype($deck) == "object") {
+            if (count($deck->deck) < ($cards * $players)) {
+                $message = "not enough cards to draw for everyone";
+                $data = [
+                    'message' => $message,
+                ];
+            } else {
+                for ($i = 0; $i < $players; $i++) {
+                    $message = "we drew $cards cards to $players players";
+                    $temp = [];
+                    for ($j = 0; $j < $cards; $j++) {
+                        $temp[] = array_pop($deck->deck);
+                    }
+                    $deal[] = $temp;
+                }
+                $data = [
+                    'message' => $message,
+                    'deal' => $deal
+                ];
+            }
+        }
+
+
+
+        return $this->render('card/card.html.twig', $data);
     }
 
     /**
      * @Route("/card/deck2", name="card-deck2", methods={"GET", "HEAD"})
      */
-    public function cardDeck2(): Response
+    public function cardDeck2(SessionInterface $session): Response
     {
-        return $this->render('card/card.html.twig');
+        $deck  = new Deck();
+        $deck->add_card("black", "joker");
+        $deck->add_card("red", "joker");
+
+        $data = [
+            'deck' => $deck->deck,
+            'message' => "Deck with joker"
+        ];
+
+        return $this->render('card/card.html.twig', $data);
     }
 }

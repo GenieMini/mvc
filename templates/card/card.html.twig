@@ -3,39 +3,56 @@
 {% block header %}Card{% endblock %}
 {% block content %}
 
-{% for card in deck %}
-<img src="img/cards/{{card.value}}_{{card.suit}}.png" style="width:100px">
-{% endfor %}
+<div class="card-buttons">
+    <ul>
+        <li><a href="{{ path('card-deck')}}">
+        Deck
+        </a></li>
+
+        <li><a href="{{ path('card-shuffle')}}">
+        Shuffle
+        </a></li>
+
+        <li><a href="{{ path('card-draw')}}">
+        Draw
+        </a></li>
+
+        <li><a href="{{ path('card-draw-number', {number: 5})}}">
+        Draw Number
+        </a></li>
+
+        <li><a href="{{ path('card-deal-players-cards', {players: 2, cards: 5})}}">
+        Deal Player Cards
+        </a></li>
+
+        <li><a href="{{ path('card-deck2')}}">
+        Deck2
+        </a></li>
+    </ul>
+</div>
 
 <h3>
-This page creates a deck for you!
-and puts it in session
+{{message}}
 </h3>
 
-<ul>
-    <li><a href="{{ path('card-deck')}}">
-    Deck
-    </a></li>
+{# draw all cards in deck _________#}
+{% if deck is defined %}
+    {% for card in deck %}
+    <img src="{{ asset('img/cards/')}}{{card.value}}_{{card.suit}}.png" style="width:100px">
+    {% endfor %}
+{% endif %}
 
-    <li><a href="{{ path('card-shuffle')}}">
-    Shuffle
-    </a></li>
 
-    <li><a href="{{ path('card-draw')}}">
-    Draw
-    </a></li>
+{# multiplayer deal ___________#}
+{% if deal is defined %}
 
-    <li><a href="{{ path('card-draw-number', {number: 5})}}">
-    Draw Number
-    </a></li>
+    {% for i in 0..(deal|length -1) %}
+        <h2>player {{i+1}}</h2>
+        {% for card in deal[i] %}
+        <img src="{{ asset('img/cards/')}}{{card.value}}_{{card.suit}}.png" style="width:100px">
+        {% endfor %}
+    {% endfor %}
 
-    <li><a href="{{ path('card-deal-players-cards', {players: 2, cards: 5})}}">
-    Deal Player Cards
-    </a></li>
-
-    <li><a href="{{ path('card-deck2')}}">
-    Deck2
-    </a></li>
-</ul>
+{% endif %}
 
 {% endblock %}

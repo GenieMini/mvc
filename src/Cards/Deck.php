@@ -7,12 +7,14 @@ use App\Cards\Card;
 class Deck
 {
     public $deck = [];
-    
-    public function __construct()
+
+    public function __construct($fill = true)
     {
-        for ($x = 0; $x <= 3; $x++) {
-            for ($i = 1; $i <= 13; $i++) {
-                $this->add_card($i, $x);
+        if ($fill) {
+            for ($x = 0; $x <= 3; $x++) {
+                for ($i = 1; $i <= 13; $i++) {
+                    $this->add_card($i, $x);
+                }
             }
         }
     }
@@ -22,4 +24,3 @@ class Deck
         $this->deck[] = new Card($value, $suit);
     }
 }
-
