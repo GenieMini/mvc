@@ -20,7 +20,8 @@ class CardController extends AbstractController
     {
         $deck  = $session->get("deck") ?? [];
         if (gettype($deck) == "array") {
-            $session->set("deck", new Deck());
+            $deck = new Deck();
+            $session->set("deck", $deck);
         }
 
         $data = [
@@ -38,7 +39,8 @@ class CardController extends AbstractController
     {
         $deck  = $session->get("deck") ?? [];
         if (gettype($deck) == "array") {
-            $session->set("deck", new Deck());
+            $deck = new Deck();
+            $session->set("deck", $deck);
         }
 
         return new JsonResponse($deck->deck);
